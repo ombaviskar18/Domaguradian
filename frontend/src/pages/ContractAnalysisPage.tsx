@@ -4,7 +4,7 @@ import { Shield, Scan, AlertTriangle, CheckCircle, Download, Wallet, Search, Bra
 import { useWallet } from '../hooks/useWallet';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
-import { contractService, switchToSonic as switchToZetaChain } from '../utils/contracts';
+import { contractService, switchToDoma as switchToZetaChain } from '../utils/contracts';
 import './ContractAnalysisPage.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
@@ -51,17 +51,17 @@ export function ContractAnalysisPage() {
     setErrorMessage('');
 
     try {
-      // Connect to wallet and switch to ZetaChain
+      // Connect to wallet and switch to Doma
       const connected = await contractService.connect();
       if (!connected) {
         setErrorMessage('Failed to connect wallet. Please ensure MetaMask is installed.');
         return;
       }
 
-      // Switch to ZetaChain network
+      // Switch to Doma network
       const switched = await switchToZetaChain();
       if (!switched) {
-        setErrorMessage('Failed to switch to SonicChain network. Please add Sonic Testnet to MetaMask.');
+        setErrorMessage('Failed to switch to Doma Testnet. Please add Doma to MetaMask.');
         return;
       }
 
@@ -72,7 +72,7 @@ export function ContractAnalysisPage() {
 
       // After successful payment, proceed with analysis
       const params = new URLSearchParams({ chain: 'ethereum', address: addr });
-              const res = await fetch(`/api/inspect?${params.toString()}`);
+      const res = await fetch(`/api/inspect?${params.toString()}`);
       const data = await res.json();
       if (!res.ok || (data as any).error) {
         const msg = (data && (data as any).error) ? String((data as any).error) : 'Unexpected error';
@@ -95,7 +95,7 @@ export function ContractAnalysisPage() {
       console.error('Error during contract analysis:', e);
       setScanResult(null);
       if (e.message && e.message.includes('Payment')) {
-        setErrorMessage('Payment required: Please ensure you have 0.01 aZETA and approve the transaction.');
+        setErrorMessage('Payment required: Please ensure you have 0.0001 ETH and approve the transaction.');
       } else if (e.message && e.message.includes('user rejected')) {
         setErrorMessage('Transaction was rejected. Please try again and approve the payment.');
       } else {
@@ -379,7 +379,7 @@ export function ContractAnalysisPage() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="analysis-hero-description"
               >
-                Comprehensive security evaluation powered by SonicChain and advanced AI analysis. 
+                Comprehensive security evaluation powered by Doma Network and advanced AI analysis. 
                 Detect vulnerabilities, honeypots, and malicious patterns before you invest.
               </motion.p>
 
@@ -484,7 +484,7 @@ export function ContractAnalysisPage() {
                         <span className="warning-title">Wallet Connection Required</span>
                       </div>
                       <p className="warning-text">
-                        Connect your wallet and pay a small testnet fee (≈$0.01) to perform security analysis.
+                        Connect your wallet and pay a small testnet fee (0.0001 ETH) to perform security analysis.
                       </p>
                     </motion.div>
                   )}

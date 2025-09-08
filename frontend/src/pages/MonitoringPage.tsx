@@ -5,7 +5,7 @@ import { useWallet } from '../hooks/useWallet';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { Chart as ChartJS, ArcElement, Tooltip as ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title, DoughnutController } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import { contractService, switchToSonic as switchToZetaChain } from '../utils/contracts';
+import { contractService, switchToDoma as switchToZetaChain } from '../utils/contracts';
 import './MonitoringPage.css';
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, Title, DoughnutController);
@@ -311,23 +311,24 @@ export function MonitoringPage() {
     setError('');
 
     try {
-      // Connect to wallet and switch to SonicChain
+      // Connect to wallet and switch to Doma
       const connected = await contractService.connect();
       if (!connected) {
         setError('Failed to connect wallet. Please ensure MetaMask is installed.');
         return;
       }
 
-      // Switch to SonicChain network
+      // Switch to Doma network
       const switched = await switchToZetaChain();
       if (!switched) {
-        setError('Failed to switch to SonicChain network. Please add Sonic Testnet to MetaMask.');
+        setError('Failed to switch to Doma Testnet. Please add Doma to MetaMask.');
         return;
       }
 
       // Call smart contract with payment
       console.log('Calling smart contract for monitoring...');
-      const tx = await contractService.requestMonitoring(tokenInput.trim());
+      const defaultAlertThresholdBps = 500; // 5% change
+      const tx = await contractService.requestMonitoring(tokenInput.trim(), defaultAlertThresholdBps);
       console.log('Transaction successful:', tx);
 
       // After successful payment, proceed with token analysis
@@ -380,7 +381,7 @@ export function MonitoringPage() {
     } catch (err: any) {
       console.error('Error starting monitoring:', err);
       if (err.message && err.message.includes('Payment')) {
-        setError('Payment required: Please ensure you have 0.01 aZETA and approve the transaction.');
+        setError('Payment required: Please ensure you have 0.0001 ETH and approve the transaction.');
       } else if (err.message && err.message.includes('user rejected')) {
         setError('Transaction was rejected. Please try again and approve the payment.');
       } else {
@@ -831,7 +832,7 @@ export function MonitoringPage() {
                         <span className="warning-title">Wallet Connection Required</span>
                       </div>
                       <p className="warning-text">
-                        Connect your wallet and pay a small testnet fee (≈$0.01) to start real-time monitoring.
+                        Connect your wallet and pay a small testnet fee (0.0001 ETH) to start real-time monitoring.
                       </p>
                     </motion.div>
                   )}

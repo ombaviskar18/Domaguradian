@@ -1,13 +1,15 @@
 {
-  "name": "sonic-guardian",
+  "name": "doma-guardian",
   "version": "1.0.0",
-  "description": "DeFi Security & Analysis Platform built on Sonic Network with S token integration.",
+  "description": "DeFi Security & Domain Analysis Platform built on Doma Network with ETH token integration.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint:fix": "npx eslint . --ext .js,.ts --fix",
     "lint": "npx eslint . --ext .js,.ts",
+    "deploy:doma": "npx hardhat run scripts/deploy-doma.ts --network doma",
     "deploy:sonic": "npx hardhat run scripts/deploy-sonic.ts --network sonic",
+    "test:doma": "npx hardhat run scripts/test-contracts.ts --network doma",
     "test:sonic": "npx hardhat run scripts/test-contracts.ts --network sonic",
     "deploy:localnet": "npx hardhat compile --force && npx hardhat deploy --network localhost --gateway 0x9A676e781A523b5d0C0e43731313A708CB607508 && npx hardhat deploy --name Echo --network localhost --gateway 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
     "server": "node server/index.js",

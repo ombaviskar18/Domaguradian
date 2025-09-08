@@ -1,151 +1,117 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import "./SToken.sol";
+import "./DToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract Monitoring {
-    SToken public immutable S_TOKEN;
+contract Monitoring is Ownable, ReentrancyGuard {
+    DToken public immutable dToken;
     
-    // Payment required for each analysis (1 S token)
-    uint256 public constant ANALYSIS_PAYMENT = 1 * 10**18; // 1 S token
+    // Payment required for each monitoring setup (0.0001 ETH)
+    uint256 public constant MONITORING_COST = 0.0001 ether;
     
     // Events
-    event MonitoringRequested(address indexed user, string targetAddress, uint256 payment);
-    event MonitoringCompleted(address indexed user, string targetAddress, uint256 riskScore, string analysis);
-    event AlertTriggered(address indexed user, string targetAddress, string alertType, string message);
+    event MonitoringRequested(address indexed user, string tokenAddress, uint256 payment);
+    event MonitoringSetup(address indexed user, string tokenAddress, uint256 alertThreshold);
+    event AlertTriggered(address indexed user, string tokenAddress, string alertType, uint256 value);
     event PaymentReceived(address indexed user, uint256 amount);
-    error Unauthorized();
-    error InsufficientSTokens();
-    error InvalidTargetAddress();
+    
+    // Errors
+    error InsufficientPayment();
+    error InvalidTokenAddress();
+    error MonitoringNotActive();
     
     // Structs
     struct MonitoringRequest {
         address user;
-        string targetAddress;
+        string tokenAddress;
         uint256 payment;
-        bool completed;
-        uint256 riskScore;
-        string analysis;
+        bool active;
+        uint256 alertThreshold;
         uint256 timestamp;
-        bool isActive;
+        uint256 alertCount;
     }
     
     // State variables
-    mapping(address => MonitoringRequest[]) public userRequests;
-    address public owner;
+    mapping(address => MonitoringRequest[]) public userMonitoring;
+    mapping(string => address[]) public tokenMonitors; // tokenAddress => users monitoring it
     
-    modifier onlyOwner() {
-        if (msg.sender != owner) revert Unauthorized();
-        _;
-    }
-    
-    modifier requireSTokens() {
-        if (!S_TOKEN.hasEnoughForFeature(msg.sender)) revert InsufficientSTokens();
+    modifier requirePayment() {
+        if (!dToken.hasFeaturePayment(msg.sender)) revert InsufficientPayment();
         _;
     }
 
-    constructor(address sTokenAddress) {
-        S_TOKEN = SToken(sTokenAddress);
-        owner = msg.sender;
-    }
-
-    /**
-     * @dev Initialize the contract with S token authorization
-     */
-    function initialize() external onlyOwner {
-        // This will be called after deployment to authorize this contract to use S tokens
-        // The owner needs to call S_TOKEN.authorizeContract(address(this), true)
+    constructor(address payable _dToken) Ownable(msg.sender) {
+        dToken = DToken(_dToken);
     }
     
     /**
-     * @dev Request monitoring service - requires payment for each analysis
-     * @param targetAddress The address to monitor
+     * @dev Request monitoring setup - requires 0.0001 ETH payment
+     * @param tokenAddress The token address to monitor
+     * @param alertThreshold Price change threshold for alerts (in basis points)
      */
-    function requestMonitoring(string memory targetAddress) external requireSTokens {
-        if (bytes(targetAddress).length == 0) revert InvalidTargetAddress();
+    function requestMonitoring(string memory tokenAddress, uint256 alertThreshold) external requirePayment nonReentrant {
+        if (bytes(tokenAddress).length == 0) revert InvalidTokenAddress();
         
-        // Use 1 S token for the monitoring
-        S_TOKEN.useFeature(msg.sender, ANALYSIS_PAYMENT);
+        // Use DToken payment
+        dToken.useFeature(msg.sender);
         
         // Create monitoring request
         MonitoringRequest memory newRequest = MonitoringRequest({
             user: msg.sender,
-            targetAddress: targetAddress,
-            payment: ANALYSIS_PAYMENT,
-            completed: false,
-            riskScore: 0,
-            analysis: "",
+            tokenAddress: tokenAddress,
+            payment: MONITORING_COST,
+            active: true,
+            alertThreshold: alertThreshold,
             timestamp: block.timestamp,
-            isActive: true
+            alertCount: 0
         });
         
-        userRequests[msg.sender].push(newRequest);
+        userMonitoring[msg.sender].push(newRequest);
+        tokenMonitors[tokenAddress].push(msg.sender);
         
-        emit MonitoringRequested(msg.sender, targetAddress, ANALYSIS_PAYMENT);
-        emit PaymentReceived(msg.sender, ANALYSIS_PAYMENT);
+        emit MonitoringRequested(msg.sender, tokenAddress, MONITORING_COST);
+        emit MonitoringSetup(msg.sender, tokenAddress, alertThreshold);
+        emit PaymentReceived(msg.sender, MONITORING_COST);
     }
     
     /**
-     * @dev Complete monitoring analysis (called by owner/backend)
-     * @param user The user who requested the monitoring
-     * @param requestIndex Index of the request in user's requests array
-     * @param riskScore The calculated risk score (0-100)
-     * @param analysis The analysis report
-     */
-    function completeAnalysis(
-        address user,
-        uint256 requestIndex,
-        uint256 riskScore,
-        string memory analysis
-    ) external onlyOwner {
-        require(requestIndex < userRequests[user].length, "Invalid request index");
-        require(!userRequests[user][requestIndex].completed, "Analysis already completed");
-        
-        userRequests[user][requestIndex].completed = true;
-        userRequests[user][requestIndex].riskScore = riskScore;
-        userRequests[user][requestIndex].analysis = analysis;
-        
-        emit MonitoringCompleted(
-            user,
-            userRequests[user][requestIndex].targetAddress,
-            riskScore,
-            analysis
-        );
-    }
-    
-    /**
-     * @dev Trigger an alert for a monitored address
-     * @param user The user to alert
-     * @param requestIndex Index of the request
-     * @param alertType Type of alert (e.g., "High Risk", "Suspicious Activity")
-     * @param message Alert message
+     * @dev Trigger alert for monitored token (called by owner/backend)
+     * @param tokenAddress The token address that triggered the alert
+     * @param alertType Type of alert (e.g., "PRICE_SPIKE", "WHALE_MOVEMENT", "VOLUME_SURGE")
+     * @param value The value that triggered the alert
      */
     function triggerAlert(
-        address user,
-        uint256 requestIndex,
+        string memory tokenAddress,
         string memory alertType,
-        string memory message
+        uint256 value
     ) external onlyOwner {
-        require(requestIndex < userRequests[user].length, "Invalid request index");
-        require(userRequests[user][requestIndex].isActive, "Monitoring not active");
+        address[] memory monitors = tokenMonitors[tokenAddress];
         
-        emit AlertTriggered(
-            user,
-            userRequests[user][requestIndex].targetAddress,
-            alertType,
-            message
-        );
+        for (uint256 i = 0; i < monitors.length; i++) {
+            address user = monitors[i];
+            MonitoringRequest[] storage requests = userMonitoring[user];
+            
+            for (uint256 j = 0; j < requests.length; j++) {
+                if (keccak256(bytes(requests[j].tokenAddress)) == keccak256(bytes(tokenAddress)) && 
+                    requests[j].active) {
+                    requests[j].alertCount += 1;
+                    emit AlertTriggered(user, tokenAddress, alertType, value);
+                }
+            }
+        }
     }
     
     /**
-     * @dev Stop monitoring for a specific request
-     * @param requestIndex Index of the request to stop monitoring
+     * @dev Stop monitoring for a token
+     * @param requestIndex Index of the monitoring request to stop
      */
     function stopMonitoring(uint256 requestIndex) external {
-        require(requestIndex < userRequests[msg.sender].length, "Invalid request index");
-        require(userRequests[msg.sender][requestIndex].isActive, "Monitoring already stopped");
+        require(requestIndex < userMonitoring[msg.sender].length, "Invalid request index");
+        require(userMonitoring[msg.sender][requestIndex].active, "Monitoring already stopped");
         
-        userRequests[msg.sender][requestIndex].isActive = false;
+        userMonitoring[msg.sender][requestIndex].active = false;
     }
     
     /**
@@ -153,39 +119,37 @@ contract Monitoring {
      * @param user The user address
      * @return Array of monitoring requests
      */
-    function getUserRequests(address user) external view returns (MonitoringRequest[] memory) {
-        return userRequests[user];
-    }
-    
-
-    
-    /**
-     * @dev Get S token balance of this contract
-     */
-    function getContractSTokenBalance() external view returns (uint256) {
-        return S_TOKEN.balanceOf(address(this));
+    function getUserMonitoring(address user) external view returns (MonitoringRequest[] memory) {
+        return userMonitoring[user];
     }
     
     /**
-     * @dev Get user's S token balance
+     * @dev Get users monitoring a specific token
+     * @param tokenAddress The token address
+     * @return Array of user addresses
      */
-    function getUserSTokenBalance(address user) external view returns (uint256) {
-        return S_TOKEN.balanceOf(user);
+    function getTokenMonitors(string memory tokenAddress) external view returns (address[] memory) {
+        return tokenMonitors[tokenAddress];
     }
     
     /**
-     * @dev Transfer ownership
-     * @param newOwner The new owner address
+     * @dev Get user's ETH payment balance
      */
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(newOwner != address(0), "Invalid new owner");
-        owner = newOwner;
+    function getUserPaymentBalance(address user) external view returns (uint256) {
+        return dToken.getUserPaymentBalance(user);
     }
     
     /**
-     * @dev Get the S token address
+     * @dev Get the DToken address
      */
-    function getSTokenAddress() external view returns (address) {
-        return address(S_TOKEN);
+    function getDTokenAddress() external view returns (address) {
+        return address(dToken);
+    }
+    
+    /**
+     * @dev Get feature cost
+     */
+    function getFeatureCost() external pure returns (uint256) {
+        return MONITORING_COST;
     }
 }

@@ -8,9 +8,9 @@ export interface SupportedChain {
 
 export const SUPPORTED_CHAINS: SupportedChain[] = [
   {
-    explorerUrl: 'https://testnet.soniclabs.com/tx/',
-    name: 'Sonic Testnet',
-    chainId: 14601,
+    explorerUrl: 'https://explorer-testnet.doma.xyz/tx/',
+    name: 'Doma Testnet',
+    chainId: 9747,
     icon: '/logos/network-placeholder-logo.svg',
     colorHex: '#00d4ff',
   },
@@ -62,8 +62,9 @@ export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map(
   (chain) => chain.chainId
 );
 
-export const SONIC_TESTNET_EXPLORER_URL =
-  'https://testnet.soniclabs.com/tx/';
+export const DOMA_TESTNET_EXPLORER_URL =
+  'https://explorer-testnet.doma.xyz/tx/';
 
 // Backward compatibility for previous import name
-export const ZETACHAIN_ATHENS_BLOCKSCOUT_EXPLORER_URL = SONIC_TESTNET_EXPLORER_URL;
+export const SONIC_TESTNET_EXPLORER_URL = DOMA_TESTNET_EXPLORER_URL;
+export const ZETACHAIN_ATHENS_BLOCKSCOUT_EXPLORER_URL = DOMA_TESTNET_EXPLORER_URL;

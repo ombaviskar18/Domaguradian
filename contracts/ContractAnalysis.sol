@@ -1,20 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import "./SToken.sol";
+import "./DToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract ContractAnalysis {
-    SToken public immutable S_TOKEN;
+contract ContractAnalysis is Ownable, ReentrancyGuard {
+    DToken public immutable dToken;
     
-    // Payment required for each analysis (1 S token)
-    uint256 public constant ANALYSIS_PAYMENT = 1 * 10**18; // 1 S token
+    // Payment required for each analysis (0.0001 ETH)
+    uint256 public constant ANALYSIS_COST = 0.0001 ether;
     
     // Events
     event ContractAnalysisRequested(address indexed user, string contractAddress, uint256 payment);
     event ContractAnalysisCompleted(address indexed user, string contractAddress, uint256 riskScore, string analysis);
     event PaymentReceived(address indexed user, uint256 amount);
-    error Unauthorized();
-    error InsufficientSTokens();
+    
+    // Errors
+    error InsufficientPayment();
     error InvalidContractAddress();
     
     // Structs
@@ -30,46 +33,31 @@ contract ContractAnalysis {
     
     // State variables
     mapping(address => AnalysisRequest[]) public userRequests;
-    address public owner;
     
-    modifier onlyOwner() {
-        if (msg.sender != owner) revert Unauthorized();
-        _;
-    }
-    
-    modifier requireSTokens() {
-        if (!S_TOKEN.hasEnoughForFeature(msg.sender)) revert InsufficientSTokens();
+    modifier requirePayment() {
+        if (!dToken.hasFeaturePayment(msg.sender)) revert InsufficientPayment();
         _;
     }
 
-    constructor(address sTokenAddress) {
-        S_TOKEN = SToken(sTokenAddress);
-        owner = msg.sender;
-    }
-
-    /**
-     * @dev Initialize the contract with S token authorization
-     */
-    function initialize() external onlyOwner {
-        // This will be called after deployment to authorize this contract to use S tokens
-        // The owner needs to call S_TOKEN.authorizeContract(address(this), true)
+    constructor(address payable _dToken) Ownable(msg.sender) {
+        dToken = DToken(_dToken);
     }
     
     /**
-     * @dev Request contract analysis - requires 1 S token for each analysis
+     * @dev Request contract analysis - requires 0.0001 ETH payment
      * @param contractAddress The contract address to analyze
      */
-    function requestContractAnalysis(string memory contractAddress) external requireSTokens {
+    function requestContractAnalysis(string memory contractAddress) external requirePayment nonReentrant {
         if (bytes(contractAddress).length == 0) revert InvalidContractAddress();
         
-        // Use 1 S token for the analysis
-        S_TOKEN.useFeature(msg.sender, ANALYSIS_PAYMENT);
+        // Use DToken payment
+        dToken.useFeature(msg.sender);
         
         // Create analysis request
         AnalysisRequest memory newRequest = AnalysisRequest({
             user: msg.sender,
             contractAddress: contractAddress,
-            payment: ANALYSIS_PAYMENT,
+            payment: ANALYSIS_COST,
             completed: false,
             riskScore: 0,
             analysis: "",
@@ -78,8 +66,8 @@ contract ContractAnalysis {
         
         userRequests[msg.sender].push(newRequest);
         
-        emit ContractAnalysisRequested(msg.sender, contractAddress, ANALYSIS_PAYMENT);
-        emit PaymentReceived(msg.sender, ANALYSIS_PAYMENT);
+        emit ContractAnalysisRequested(msg.sender, contractAddress, ANALYSIS_COST);
+        emit PaymentReceived(msg.sender, ANALYSIS_COST);
     }
     
     /**
@@ -119,35 +107,24 @@ contract ContractAnalysis {
         return userRequests[user];
     }
     
-
-    
     /**
-     * @dev Get S token balance of this contract
+     * @dev Get user's ETH payment balance
      */
-    function getContractSTokenBalance() external view returns (uint256) {
-        return S_TOKEN.balanceOf(address(this));
+    function getUserPaymentBalance(address user) external view returns (uint256) {
+        return dToken.getUserPaymentBalance(user);
     }
     
     /**
-     * @dev Get user's S token balance
+     * @dev Get the DToken address
      */
-    function getUserSTokenBalance(address user) external view returns (uint256) {
-        return S_TOKEN.balanceOf(user);
+    function getDTokenAddress() external view returns (address) {
+        return address(dToken);
     }
     
     /**
-     * @dev Transfer ownership
-     * @param newOwner The new owner address
+     * @dev Get feature cost
      */
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(newOwner != address(0), "Invalid new owner");
-        owner = newOwner;
-    }
-    
-    /**
-     * @dev Get the S token address
-     */
-    function getSTokenAddress() external view returns (address) {
-        return address(S_TOKEN);
+    function getFeatureCost() external pure returns (uint256) {
+        return ANALYSIS_COST;
     }
 }

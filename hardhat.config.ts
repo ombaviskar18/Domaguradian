@@ -6,6 +6,12 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   networks: {
+    doma: {
+      url: "https://rpc-testnet.doma.xyz",
+      chainId: 97476,
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      gasPrice: 20000000000, // 20 gwei
+    },
     sonic: {
       url: "https://rpc.testnet.soniclabs.com",
       chainId: 14601,
