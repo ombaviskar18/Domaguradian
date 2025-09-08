@@ -6,9 +6,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from './components/Button';
 import { IconReceived, IconSpinner } from './components/icons';
 import {
-  type SupportedChain,
-  SONIC_TESTNET_EXPLORER_URL as ZETACHAIN_ATHENS_BLOCKSCOUT_EXPLORER_URL,
+  DOMA_TESTNET_EXPLORER_URL as ZETACHAIN_ATHENS_BLOCKSCOUT_EXPLORER_URL,
 } from './constants/chains';
+import type { SupportedChain } from './constants/chains';
 import { type CrossChainTxResponse } from './types/cctx';
 
 const CCTX_POLLING_URL =
@@ -37,7 +37,7 @@ export function ConfirmedContent({
     return stringValue;
   }, [stringValue]);
 
-  // Polling placeholder (disabled for Sonic)
+  // Polling placeholder (disabled for Doma)
   useEffect(() => {
     setZetachainTxHash(connectedChainTxHash || null);
   }, [connectedChainTxHash, zetachainTxHash]);
@@ -65,22 +65,7 @@ export function ConfirmedContent({
             </a>
           </div>
         )}
-        {connectedChainTxHash && (
-          <div className="confirmed-content-link-chain">
-            {!zetachainTxHash && <IconSpinner />}
-            <a
-              href={`${ZETACHAIN_ATHENS_BLOCKSCOUT_EXPLORER_URL}${zetachainTxHash}`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className={clsx('confirmed-content-link', {
-                'confirmed-content-link-enabled': zetachainTxHash,
-                'confirmed-content-link-disabled': !zetachainTxHash,
-              })}
-            >
-              View on SonicChain
-            </a>
-          </div>
-        )}
+        
       </div>
       <Button
         type="button"

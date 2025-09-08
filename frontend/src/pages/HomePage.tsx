@@ -275,10 +275,10 @@ export function HomePage() {
             className="workflow-header"
           >
             <h2 className="workflow-title">
-              How SonicGuardian Works
+              How DomaGuardian Works
             </h2>
             <p className="workflow-subtitle">
-              Four-stage analysis powered by SonicChain and AI intelligence
+              Four-stage analysis powered by Doma Network and AI intelligence
             </p>
           </motion.div>
 
@@ -322,8 +322,8 @@ export function HomePage() {
             {/* Left Side - Brand */}
             <div className="footer-brand">
               <div className="footer-logo">
-                <img src="/logos/logo.png" alt="SonicGuardian Logo" className="footer-logo-img" />
-                <span className="footer-logo-text">SonicGuardian</span>
+                <img src="/logos/logo.png" alt="DomaGuardian Logo" className="footer-logo-img" />
+                <span className="footer-logo-text">DomaGuardian</span>
               </div>
               <p className="footer-tagline">
                 Your decentralized security deserves a beautiful home.
@@ -348,7 +348,7 @@ export function HomePage() {
               <div className="footer-column">
                 <h4 className="footer-heading">SOLUTIONS</h4>
                 <ul className="footer-link-list">
-                  <li><a href="#" className="footer-link">SonicGuardian AI</a></li>
+                  <li><a href="#" className="footer-link">DomaGuardian AI</a></li>
                   <li><a href="#" className="footer-link">Risk Scanner</a></li>
                   <li><a href="#" className="footer-link">Portfolio Guard</a></li>
                   <li><Link to="/send-message" className="footer-link">Send Message</Link></li>
@@ -380,7 +380,7 @@ export function HomePage() {
           {/* Footer Bottom */}
           <div className="footer-bottom">
             <div className="footer-bottom-left">
-              <p className="footer-copyright">© 2025 Copyright SonicGuardian INC. Powered by SonicChain. Built with ❤️ for DeFi security.</p>
+              <p className="footer-copyright">© 2025 Copyright Doma Network · Built with ❤️ for DeFi security.</p>
               <div className="footer-legal">
                 <a href="#" className="footer-legal-link">Terms & Conditions</a>
                 <a href="#" className="footer-legal-link">Privacy</a>

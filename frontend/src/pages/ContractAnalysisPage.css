@@ -1579,7 +1579,7 @@
   
   /* Print header */
   .results-header::before {
-    content: "SonicGuardian - Smart Contract Security Analysis Report";
+    content: "DomaGuardian - Smart Contract Security Analysis Report";
     display: block;
     font-size: 24px;
     font-weight: bold;

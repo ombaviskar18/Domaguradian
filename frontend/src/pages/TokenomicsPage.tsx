@@ -4,7 +4,7 @@ import { CheckCircle, Download, Brain, TrendingUp, TrendingDown, Activity, Walle
 import { useWallet } from '../hooks/useWallet';
 import { Chart as ChartJS, ArcElement, Tooltip as ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, DoughnutController } from 'chart.js';
 import { Bar, Pie, Line, Doughnut } from 'react-chartjs-2';
-import { contractService, switchToSonic as switchToZetaChain } from '../utils/contracts';
+import { contractService, switchToDoma as switchToZetaChain } from '../utils/contracts';
 import './TokenomicsPage.css';
 
 ChartJS.register(ArcElement, ChartTooltip, Legend, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, DoughnutController);
@@ -201,17 +201,17 @@ export function TokenomicsPage() {
     setErrorMessage('');
     
     try {
-      // Connect to wallet and switch to SonicChain
+      // Connect to wallet and switch to Doma
       const connected = await contractService.connect();
       if (!connected) {
         setErrorMessage('Failed to connect wallet. Please ensure MetaMask is installed.');
         return;
       }
 
-      // Switch to SonicChain network
+      // Switch to Doma network
       const switched = await switchToZetaChain();
       if (!switched) {
-        setErrorMessage('Failed to switch to SonicChain network. Please add Sonic Testnet to MetaMask.');
+        setErrorMessage('Failed to switch to Doma Testnet. Please add Doma to MetaMask.');
         return;
       }
 

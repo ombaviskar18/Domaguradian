@@ -40,7 +40,7 @@ export const PricingPage = () => {
           </p>
           <div className="faucet-section">
             <a 
-              href="https://www.diadata.org/web3-builder-hub/faucets/sonic-faucets/" 
+              href="#" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="faucet-button"
@@ -200,7 +200,7 @@ export const PricingPage = () => {
       <div className="cta-section">
         <div className="cta-content">
           <h2>Ready to Secure Your Investments?</h2>
-          <p>Join thousands of users who trust SonicGuardian for their blockchain security needs</p>
+          <p>Join thousands of users who trust DomaGuardian for their blockchain security needs</p>
           <div className="cta-buttons">
             <Link to="/social-analysis" className="cta-button primary">
               Start Free Analysis

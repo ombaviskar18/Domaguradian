@@ -14,7 +14,7 @@ export function Footer() {
           {/* Tutorials */}
           <a
             className="group flex items-center justify-between bg-gray-900 hover:bg-gray-800 transition rounded-2xl p-6 shadow-md"
-            href="https://docs.soniclabs.com"
+            href="https://docs.doma.com"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -71,7 +71,7 @@ export function Footer() {
 
         {/* Footer bottom */}
         <div className="text-center md:text-left mt-12 text-sm text-gray-500 border-t border-gray-800 pt-6">
-          © 2025 SonicChain · All rights reserved
+          © 2025 DomaChain · All rights reserved
         </div>
       </div>
     </footer>

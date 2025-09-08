@@ -20,7 +20,7 @@ export function SendMessagePage() {
   const workflowSteps = [
     {
       title: 'Universal Blockchain',
-      description: 'SonicChain is a high-performance blockchain to enable native connection across all blockchain ecosystems',
+      description: 'DomaChain is a high-performance blockchain to enable native connection across all blockchain ecosystems',
       icon: Globe,
       details: 'Native access to any blockchain, making crypto as accessible, diverse, and connected as the internet'
     },
@@ -38,7 +38,7 @@ export function SendMessagePage() {
     },
     {
       title: 'Universal Smart Contract',
-      description: 'Deployed natively on SonicChain, can read and write to any connected chains',
+      description: 'Deployed natively on DomaChain, can read and write to any connected chains',
       icon: Zap,
       details: 'Orchestrate complex multi-chain actions and access liquidity across different networks'
     }
@@ -207,7 +207,7 @@ export function SendMessagePage() {
         </div>
       </section>
 
-      {/* SonicChain Workflow Section */}
+      {/* DomaChain Workflow Section */}
       <section className="sonicchain-workflow">
         <div className="workflow-container">
           

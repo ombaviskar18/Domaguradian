@@ -1922,7 +1922,7 @@
   
   /* Print header */
   .monitoring-status-header::before {
-    content: "SonicGuardian - Real-Time Monitoring Report";
+    content: "DomaGuardian - Real-Time Monitoring Report";
     display: block;
     font-size: 24px;
     font-weight: bold;

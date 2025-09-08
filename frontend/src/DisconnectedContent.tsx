@@ -2,7 +2,6 @@ import './DisconnectedContent.css';
 
 import { ConnectWallet } from './components/ConnectWallet';
 import { IconAnimation } from './components/icons/IconAnimation';
-import { IconSonicChainLogo } from './components/icons/IconZetaChainLogo';
 
 export function DisconnectedContent() {
   return (
@@ -15,7 +14,7 @@ export function DisconnectedContent() {
           </div>
           <p className="hero-content-description">
             Connect your EVM wallet and trigger contract on
-            SonicChain testnet from any currently supported EVM chain.
+            DomaChain testnet from any currently supported EVM chain.
           </p>
           <ConnectWallet />
         </div>

@@ -1,13 +1,10 @@
-# 🎨 SonicGuardian Frontend
+# 🎨 DomaGuardian Frontend
 
 <div align="center">
-  <img src="public/logos/logo.png" alt="SonicGuardian Logo" width="80" height="80">
+  <img src="public/logos/logo.png" alt="DomaGuardian Logo" width="80" height="80">
   
-  <h3>Modern React Frontend for Decentralized Security</h3>
-  
-  [![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
-  [![Vite](https://img.shields.io/badge/Vite-5+-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev)
+  <p><strong>Built with ❤️ using React + TypeScript + Vite</strong></p>
+  <p>Part of the DomaGuardian Security Suite</p>
 </div>
 
 ## 🚀 Quick Start
@@ -141,5 +138,5 @@ MIT License - see [LICENSE](../LICENSE) file for details.
 
 <div align="center">
   <p><strong>Built with ❤️ using React + TypeScript + Vite</strong></p>
-  <p>Part of the SonicGuardian Security Suite</p>
+  <p>Part of the DomaGuardian Security Suite</p>
 </div>
