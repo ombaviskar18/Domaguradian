@@ -1,0 +1,12 @@
+// SonicGuardian Contract Addresses on Sonic Testnet
+export const SONIC_GUARDIAN_CONTRACTS = {
+  SToken: '0x7ba0f1BA2F61aB8190200C20b7755C56292C5728',
+  ContractAnalysis: '0x3a0B68b62Ae686D49cFe4ED15F903337557A26a4',
+  Tokenomics: '0x48a471675A98FB98e70989C55c785aaFd75Aa67a',
+  SocialAnalysis: '0xa4916233f1FF28C638E987a1bDc8d03bDdf92d98',
+  Monitoring: '0x3523675708a44f68e19B390471a5ddC87E985f06',
+  Universal: '0xaa71b81373d21496073c089c7D54a24b28CD1e1b',
+} as const;
+
+// Legacy export for backward compatibility
+export const HELLO_UNIVERSAL_CONTRACT_ADDRESS = SONIC_GUARDIAN_CONTRACTS.Universal;
